@@ -1,0 +1,11 @@
+---
+- name: update apt-cache
+  apt: update_cache=true
+
+- name: set hostname
+  hostname: name={{ inventory_hostname }}
+
+- name: add sshd config
+  copy: src=sshd_config dest=/etc/ssh/sshd_config
+  notify:
+    - reload sshd

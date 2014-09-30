@@ -1,0 +1,16 @@
+---
+- name: install php
+  apt: pkg={{ item }} state=installed
+  with_items:
+    - php5-fpm
+    - php5-mysql
+
+- name: add php configuration
+  copy: src=php.ini dest=/etc/php/
+  notify:
+    - restart php5-fpm
+
+- name: add php-fpm pool configuration
+  copy: src=www.conf dest=/etc/php5/fpm/pool.d/
+  notify:
+    - restart php5-fpm

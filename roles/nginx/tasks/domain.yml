@@ -1,0 +1,13 @@
+---
+- name: add {{ name }} config
+  copy: src={{ name }} dest=/etc/nginx/sites-available/{{ name }}
+  notify:
+    - reload nginx
+
+- name: create /var/www/{{ name }}
+  file: dest=/var/www/{{ name }} owner=www-data group=www-data mode=0774 state=directory
+
+- name: enable {{ name }}
+  file: src=/etc/nginx/sites-available/{{ name }} dest=/etc/nginx/sites-enabled/{{ name }} state=link
+  notify:
+    - reload nginx

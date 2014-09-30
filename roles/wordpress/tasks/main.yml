@@ -1,0 +1,45 @@
+---
+- name: install prerequisites
+  apt: pkg={{ item }} state=installed
+  with_items:
+    - sendmail
+    - unzip
+
+- name: download WordPress
+  get_url: url=http://wordpress.org/{{ archive }} dest=/root/{{ archive }} sha256sum={{ wp_sha256sum }}
+
+- name: create /var/www
+  file: dest=/var/www owner=www-data group=www-data state=directory
+
+- name: extract archive
+  command: chdir=/var/www /bin/tar xzf /root/{{ archive }} creates=/var/www/wordpress
+
+- name: rename app directory
+  command: mv /var/www/wordpress /var/www/{{ vhost }} creates=/var/www/{{ vhost }}
+
+- name: fetch random salts for WordPress config
+  local_action: command curl https://api.wordpress.org/secret-key/1.1/salt/
+  register: "wp_salt"
+  sudo: no
+
+- name: add config file
+  template: src=wp-config.php dest=/var/www/{{ vhost }}
+
+- name: change ownership of app directory
+  file: dest=/var/www/{{ vhost }} owner=www-data group=www-data state=directory recurse=yes
+
+- name: add database
+  mysql_db: name={{ wp_db }} state=present
+
+- name: add database user
+  mysql_user: name={{ wp_db_user }} password={{ wp_db_password }} priv={{ wp_db }}.*:ALL host='localhost' state=present
+
+- name: add vhost
+  copy: src=files/{{ vhost }} dest=/etc/nginx/sites-available/
+  notify:
+    - reload nginx
+
+- name: enable vhost
+  file: src=/etc/nginx/sites-available/{{ vhost }} dest=/etc/nginx/sites-enabled/{{ vhost }} state=link
+  notify:
+    - reload nginx

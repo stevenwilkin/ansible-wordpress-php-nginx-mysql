@@ -1,0 +1,13 @@
+---
+- name: remove apache2
+  apt: pkg=apache2 state=absent
+
+- name: install nginx
+  apt: pkg=nginx state=installed
+  notify:
+    - start nginx
+
+- name: add nginx configuration
+  copy: src=nginx.conf dest=/etc/nginx/nginx.conf
+  notify:
+    - reload nginx

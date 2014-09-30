@@ -1,0 +1,10 @@
+---
+- hosts: php
+  sudo: yes
+  vars:
+    vhost: 192.168.100.2
+    wp_db: blog
+    wp_db_user: blog
+    wp_db_password: 7jA2VvN7KQIW
+  roles:
+    - wordpress

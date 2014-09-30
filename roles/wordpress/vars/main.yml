@@ -1,0 +1,4 @@
+---
+  wp_version: 3.9.1
+  wp_sha256sum: 73c21224d42156150b948ca645a296a2431f1dd6a19350e0d8a72e465adde56d
+  archive: wordpress-{{ wp_version }}.tar.gz
